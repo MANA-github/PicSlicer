@@ -11,17 +11,15 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
 using System.Windows.Shapes;
+using Syncfusion.Licensing;
 
-namespace PicSlicer
+namespace HomeMenu
 {
-    /// <summary>
-    /// _.xaml の相互作用ロジック
-    /// </summary>
-    public partial class _ : Window
+    public partial class App : Application
     {
-        public _()
+        public App()
         {
-            InitializeComponent();
+            SyncfusionLicenseProvider.RegisterLicense("Ngo9BigBOggjHTQxAR8/V1JGaF1cWmhIfEx1RHxQdld5ZFRHallYTnNWUj0eQnxTdENjWn9ZcXFWQWBeUUxxWUleYQ==");
         }
     }
 }

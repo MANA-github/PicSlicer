@@ -3,12 +3,15 @@ using System;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media.Imaging;
+using Syncfusion.UI.Xaml.Diagram.Controls;
+using Syncfusion.UI.Xaml.Diagram;
+using Syncfusion.Licensing;
 
-namespace MenuSample
+
+namespace HomeMenu
 {
     public partial class MainWindow : Window
     {
-
         public MainWindow()
         {
             InitializeComponent();
@@ -28,11 +31,35 @@ namespace MenuSample
             }
         }
 
-        private void ToggleRuler_Click(object sender, RoutedEventArgs e)
+        private void HorizontalToggleRuler_Click(object sender, RoutedEventArgs e)
         {
-
+            if (diagram.HorizontalRuler == null)
+            {
+                diagram.HorizontalRuler = new Ruler()
+                {
+                    Orientation = Orientation.Horizontal
+                };
+            }
+            else
+            {
+                diagram.HorizontalRuler = null;
+            }
         }
 
+        private void VerticalToggleRuler_Click(object sender, RoutedEventArgs e)
+        {
+            if (diagram.VerticalRuler == null)
+            {
+                diagram.VerticalRuler = new Ruler()
+                {
+                    Orientation = Orientation.Vertical
+                };
+            }
+            else
+            {
+                diagram.VerticalRuler = null;
+            }
+        }
 
 
         private void Save_Click(object sender, RoutedEventArgs e)
