@@ -17,25 +17,43 @@
             </MenuItem>
             <MenuItem Header="_表示">
                 <MenuItem Header="縦ルーラー表示"
-                          IsCheckable="True"
-                          Click="VerticalToggleRuler_Click"/>
+                    IsCheckable="True"
+                    Click="VerticalToggleRuler_Click"/>
                 <MenuItem Header="横ルーラー表示"
-                          IsCheckable="True"
-                          Click="HorizontalToggleRuler_Click"/>
+                    IsCheckable="True"
+                    Click="HorizontalToggleRuler_Click"/>
             </MenuItem>
         </Menu>
 
-        
 
-        <Grid Background="LightGray">
+        <Grid DockPanel.Dock="Top" Background="LightGray">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="25"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="25"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
             <syncfusion:SfDiagram x:Name="diagram"
-                      Background="Transparent"/>
+                Grid.Row="0"
+                Grid.Column="0"
+                Grid.RowSpan="2"
+                Grid.ColumnSpan="2"
+                Background="Transparent"/>
+
             <Image x:Name="PreviewImage"
-                   Stretch="Uniform"
-                   IsHitTestVisible="False"/>
+                Grid.Row="1"
+                Grid.Column="1"
+                Stretch="Uniform"
+                IsHitTestVisible="False"/>
 
             <Canvas x:Name="OverlayCanvas"
-                    IsHitTestVisible="False"/>
+                Grid.Row="1"
+                Grid.Column="1"
+                IsHitTestVisible="False"/>
         </Grid>
 
     </DockPanel>

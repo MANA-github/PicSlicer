@@ -61,7 +61,6 @@ namespace HomeMenu
             }
         }
 
-
         private void Save_Click(object sender, RoutedEventArgs e)
             => MessageBox.Show("保存が押されました");
 
