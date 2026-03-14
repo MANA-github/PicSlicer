@@ -10,15 +10,34 @@ using static System.Net.Mime.MediaTypeNames;
 using System.Windows.Input;
 using System.Windows.Media;
 using System.IO;
+using WpfLibrary1;
+
+/*
+ H...Horizontal
+ V...Vertical
+ */
 
 
 namespace HomeMenu
 {
     public partial class MainWindow : Window
     {
+        private GuideLineManager guideManager;
+
         public MainWindow()
         {
             InitializeComponent();
+            guideManager = new GuideLineManager(GuidLineCanvas);
+
+            diagram.HorizontalRuler = new Ruler()
+            {
+                Orientation = Orientation.Horizontal
+            };
+
+            diagram.VerticalRuler = new Ruler()
+            {
+                Orientation = Orientation.Vertical
+            };
         }
 
         private void Open_Click(object sender, RoutedEventArgs e)
@@ -47,36 +66,28 @@ namespace HomeMenu
             }
         }
 
-        private void HorizontalToggleRuler_Click(object sender, RoutedEventArgs e)
+        private void Exit_Click(object sender, RoutedEventArgs e)
+            => Close();
+
+        private void Add_H_Click(object sender, RoutedEventArgs e)
         {
-            if (diagram.HorizontalRuler == null)
-            {
-                diagram.HorizontalRuler = new Ruler()
-                {
-                    Orientation = Orientation.Horizontal
-                };
-            }
-            else
-            {
-                diagram.HorizontalRuler = null;
-            }
+            guideManager.AddLine();
         }
 
-        private void VerticalToggleRuler_Click(object sender, RoutedEventArgs e)
+        private void Remove_H_Click(object sender, RoutedEventArgs e)
         {
-            if (diagram.VerticalRuler == null)
-            {
-                diagram.VerticalRuler = new Ruler()
-                {
-                    Orientation = Orientation.Vertical
-                };
-            }
-            else
-            {
-                diagram.VerticalRuler = null;
-            }
+            guideManager.RemoveTopLine();
         }
 
+        private void Add_V_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
+
+        private void Remove_V_Click(object sender, RoutedEventArgs e)
+        {
+
+        }
 
         private void SaveImage(BitmapSource image)
         {
@@ -120,9 +131,6 @@ namespace HomeMenu
                 encoder.Save(stream);
             }
         }
-
-        private void Exit_Click(object sender, RoutedEventArgs e)
-            => Close();
     }
 
 }
