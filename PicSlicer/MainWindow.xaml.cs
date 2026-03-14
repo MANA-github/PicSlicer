@@ -23,6 +23,8 @@ namespace HomeMenu
     public partial class MainWindow : Window
     {
         private GuideLineManager guideManager;
+        private int ImageWidth;
+        private int ImageHeight;
 
         public MainWindow()
         {
@@ -48,10 +50,15 @@ namespace HomeMenu
                 Filter = "画像 (*.png;*.jpg)|*.png;*.jpg|すべて (*.*)|*.*"
             };
 
-            if (dlg.ShowDialog() == true)
-            {
-                PreviewImage.Source = new BitmapImage(new Uri(dlg.FileName));
-            }
+            if (dlg.ShowDialog() != true)
+                return;
+
+            BitmapImage bitmap = new BitmapImage(new Uri(dlg.FileName));
+            PreviewImage.Source = bitmap;
+
+            ImageWidth = bitmap.PixelWidth;
+            ImageHeight = bitmap.PixelHeight;
+
         }
 
         private void Save_Click(object sender, RoutedEventArgs e)
@@ -71,22 +78,22 @@ namespace HomeMenu
 
         private void Add_H_Click(object sender, RoutedEventArgs e)
         {
-            guideManager.AddLine();
+            guideManager.Add_H_Line();
         }
 
         private void Remove_H_Click(object sender, RoutedEventArgs e)
         {
-            guideManager.RemoveTopLine();
+            guideManager.Remove_H_Line();
         }
 
         private void Add_V_Click(object sender, RoutedEventArgs e)
         {
-
+            guideManager.Add_V_Line();
         }
 
         private void Remove_V_Click(object sender, RoutedEventArgs e)
         {
-
+            guideManager.Remove_V_Line();
         }
 
         private void SaveImage(BitmapSource image)

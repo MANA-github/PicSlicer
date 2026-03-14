@@ -10,7 +10,9 @@ namespace WpfLibrary1
     public class GuideLineManager
     {
         private Canvas canvas;
-        private List<Border> lines = new List<Border>();
+
+        private List<Border> hLines = new List<Border>();
+        private List<Border> vLines = new List<Border>();
 
         private bool isDragging = false;
         private Border? currentLine;
@@ -21,7 +23,11 @@ namespace WpfLibrary1
             this.canvas = canvas;
         }
 
-        private Border CreateLine(double y)
+        // ===============================
+        // 水平ライン
+        // ===============================
+
+        private Border CreateHorizontalLine(double y)
         {
             Border line = new Border
             {
@@ -49,23 +55,77 @@ namespace WpfLibrary1
             return line;
         }
 
-        public void AddLine()
+        public void Add_H_Line()
         {
-            var line = CreateLine(100);
+            var line = CreateHorizontalLine(100);
 
-            lines.Add(line);
+            hLines.Add(line);
             canvas.Children.Add(line);
         }
 
-        public void RemoveTopLine()
+        public void Remove_H_Line()
         {
-            if (lines.Count == 0) return;
+            if (hLines.Count == 0) return;
 
-            var lowest = lines.OrderBy(x => Canvas.GetTop(x)).First();
+            var lowest = hLines.OrderBy(x => Canvas.GetTop(x)).First();
 
             canvas.Children.Remove(lowest);
-            lines.Remove(lowest);
+            hLines.Remove(lowest);
         }
+
+        // ===============================
+        // 垂直ライン
+        // ===============================
+
+        private Border CreateVerticalLine(double x)
+        {
+            Border line = new Border
+            {
+                Width = 20,
+                Height = 10000,
+                Background = Brushes.Transparent
+            };
+
+            Border visual = new Border
+            {
+                Width = 1,
+                Background = Brushes.Blue,
+                HorizontalAlignment = HorizontalAlignment.Center
+            };
+
+            line.Child = visual;
+
+            Canvas.SetTop(line, 0);
+            Canvas.SetLeft(line, x);
+
+            line.MouseLeftButtonDown += Line_MouseDown;
+            line.MouseMove += Line_MouseMove;
+            line.MouseLeftButtonUp += Line_MouseUp;
+
+            return line;
+        }
+
+        public void Add_V_Line()
+        {
+            var line = CreateVerticalLine(100);
+
+            vLines.Add(line);
+            canvas.Children.Add(line);
+        }
+
+        public void Remove_V_Line()
+        {
+            if (vLines.Count == 0) return;
+
+            var leftMost = vLines.OrderBy(x => Canvas.GetLeft(x)).First();
+
+            canvas.Children.Remove(leftMost);
+            vLines.Remove(leftMost);
+        }
+
+        // ===============================
+        // ドラッグ処理
+        // ===============================
 
         private void Line_MouseDown(object sender, MouseButtonEventArgs e)
         {
@@ -83,10 +143,18 @@ namespace WpfLibrary1
 
             var position = e.GetPosition(canvas);
 
-            double newY = position.Y - clickPosition.Y;
-            newY = Math.Clamp(newY, 20, 300);
-
-            Canvas.SetTop(currentLine, newY);
+            if (hLines.Contains(currentLine))
+            {
+                double newY = position.Y - clickPosition.Y;
+                newY = Math.Clamp(newY, 20, 300);
+                Canvas.SetTop(currentLine, newY);
+            }
+            else if (vLines.Contains(currentLine))
+            {
+                double newX = position.X - clickPosition.X;
+                newX = Math.Clamp(newX, 20, 300);
+                Canvas.SetLeft(currentLine, newX);
+            }
         }
 
         private void Line_MouseUp(object sender, MouseButtonEventArgs e)

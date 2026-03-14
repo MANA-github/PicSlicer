@@ -29,6 +29,11 @@
             </MenuItem>
         </Menu>
 
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBarItem>
+                <TextBlock Name="ImageSizeText" Text="画像サイズ: -"/>
+            </StatusBarItem>
+        </StatusBar>
 
         <Grid DockPanel.Dock="Top" Background="LightGray">
             <Grid.RowDefinitions>
