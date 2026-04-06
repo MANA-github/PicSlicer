@@ -9,124 +9,121 @@ namespace WpfLibrary1
 {
     public class GuideLineManager
     {
-        private Canvas canvas;
+        private readonly Canvas canvas;
 
-        private List<Border> hLines = new List<Border>();
-        private List<Border> vLines = new List<Border>();
+        private readonly List<Border> hLines = new();
+        private readonly List<Border> vLines = new();
 
-        private bool isDragging = false;
+        private bool isDragging;
         private Border? currentLine;
         private Point clickPosition;
+
+        private int imageWidth;
+        private int imageHeight;
+
+        private const double HitArea = 20;
+        private const double LineThickness = 1;
+        private const double MaxLength = 10000;
 
         public GuideLineManager(Canvas canvas)
         {
             this.canvas = canvas;
         }
 
-        // ===============================
-        // 水平ライン
-        // ===============================
-
-        private Border CreateHorizontalLine(double y)
+        public void SetImageSize(int width, int height)
         {
-            Border line = new Border
+            imageWidth = width;
+            imageHeight = height;
+        }
+
+        // ===============================
+        // 共通ライン生成
+        // ===============================
+        private Border CreateLine(bool isHorizontal, double pos)
+        {
+            var line = new Border
             {
-                Width = 10000,
-                Height = 20,
-                Background = Brushes.Transparent
+                Width = isHorizontal ? MaxLength : HitArea,
+                Height = isHorizontal ? HitArea : MaxLength,
+                Background = Brushes.Transparent,
+                Tag = isHorizontal // ← 種別保持（重要）
             };
 
-            Border visual = new Border
+            var visual = new Border
             {
-                Height = 1,
-                Background = Brushes.Red,
+                Width = isHorizontal ? double.NaN : LineThickness,
+                Height = isHorizontal ? LineThickness : double.NaN,
+                Background = isHorizontal ? Brushes.Red : Brushes.Blue,
+                HorizontalAlignment = HorizontalAlignment.Center,
                 VerticalAlignment = VerticalAlignment.Center
             };
 
             line.Child = visual;
 
-            Canvas.SetLeft(line, 0);
-            Canvas.SetTop(line, y);
+            if (isHorizontal)
+            {
+                Canvas.SetLeft(line, 0);
+                Canvas.SetTop(line, pos);
+            }
+            else
+            {
+                Canvas.SetTop(line, 0);
+                Canvas.SetLeft(line, pos);
+            }
 
-            line.MouseLeftButtonDown += Line_MouseDown;
-            line.MouseMove += Line_MouseMove;
-            line.MouseLeftButtonUp += Line_MouseUp;
-
+            AttachEvents(line);
             return line;
         }
 
+        private void AttachEvents(Border line)
+        {
+            line.MouseLeftButtonDown += Line_MouseDown;
+            line.MouseMove += Line_MouseMove;
+            line.MouseLeftButtonUp += Line_MouseUp;
+        }
+
+        // ===============================
+        // 水平ライン
+        // ===============================
         public void Add_H_Line()
         {
-            var line = CreateHorizontalLine(100);
-
+            var line = CreateLine(true, 100);
             hLines.Add(line);
             canvas.Children.Add(line);
         }
 
         public void Remove_H_Line()
         {
-            if (hLines.Count == 0) return;
-
-            var lowest = hLines.OrderBy(x => Canvas.GetTop(x)).First();
-
-            canvas.Children.Remove(lowest);
-            hLines.Remove(lowest);
+            RemoveLine(hLines, Canvas.GetTop);
         }
 
         // ===============================
         // 垂直ライン
         // ===============================
-
-        private Border CreateVerticalLine(double x)
-        {
-            Border line = new Border
-            {
-                Width = 20,
-                Height = 10000,
-                Background = Brushes.Transparent
-            };
-
-            Border visual = new Border
-            {
-                Width = 1,
-                Background = Brushes.Blue,
-                HorizontalAlignment = HorizontalAlignment.Center
-            };
-
-            line.Child = visual;
-
-            Canvas.SetTop(line, 0);
-            Canvas.SetLeft(line, x);
-
-            line.MouseLeftButtonDown += Line_MouseDown;
-            line.MouseMove += Line_MouseMove;
-            line.MouseLeftButtonUp += Line_MouseUp;
-
-            return line;
-        }
-
         public void Add_V_Line()
         {
-            var line = CreateVerticalLine(100);
-
+            var line = CreateLine(false, 100);
             vLines.Add(line);
             canvas.Children.Add(line);
         }
 
         public void Remove_V_Line()
         {
-            if (vLines.Count == 0) return;
+            RemoveLine(vLines, Canvas.GetLeft);
+        }
 
-            var leftMost = vLines.OrderBy(x => Canvas.GetLeft(x)).First();
+        private void RemoveLine(List<Border> list, System.Func<Border, double> selector)
+        {
+            if (list.Count == 0) return;
 
-            canvas.Children.Remove(leftMost);
-            vLines.Remove(leftMost);
+            var target = list.OrderBy(selector).First();
+            canvas.Children.Remove(target);
+            list.Remove(target);
         }
 
         // ===============================
         // ドラッグ処理
         // ===============================
-
         private void Line_MouseDown(object sender, MouseButtonEventArgs e)
         {
             if (sender is not Border line) return;
@@ -141,19 +138,18 @@ namespace WpfLibrary1
         {
             if (!isDragging || currentLine == null) return;
 
-            var position = e.GetPosition(canvas);
+            var pos = e.GetPosition(canvas);
+            bool isHorizontal = (bool)currentLine.Tag;
 
-            if (hLines.Contains(currentLine))
+            if (isHorizontal)
             {
-                double newY = position.Y - clickPosition.Y;
-                newY = Math.Clamp(newY, 20, 300);
-                Canvas.SetTop(currentLine, newY);
+                double y = Math.Clamp(pos.Y - clickPosition.Y, 0, imageHeight);
+                Canvas.SetTop(currentLine, y);
             }
-            else if (vLines.Contains(currentLine))
+            else
             {
-                double newX = position.X - clickPosition.X;
-                newX = Math.Clamp(newX, 20, 300);
-                Canvas.SetLeft(currentLine, newX);
+                double x = Math.Clamp(pos.X - clickPosition.X, 0, imageWidth);
+                Canvas.SetLeft(currentLine, x);
             }
         }
 
@@ -163,6 +159,20 @@ namespace WpfLibrary1
 
             isDragging = false;
             currentLine.ReleaseMouseCapture();
+            currentLine = null;
+        }
+
+        // ===============================
+        // 座標取得（追加）
+        // ===============================
+        public List<double> GetHorizontalPositions()
+        {
+            return hLines.Select(x => Canvas.GetTop(x)).ToList();
+        }
+
+        public List<double> GetVerticalPositions()
+        {
+            return vLines.Select(x => Canvas.GetLeft(x)).ToList();
         }
     }
 }
