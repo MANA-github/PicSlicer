@@ -8,8 +8,5 @@
     <ImplicitUsings>enable</ImplicitUsings>
   </PropertyGroup>
 
-  <ItemGroup>
-    <PackageReference Include="Syncfusion.SfDiagram.WPF" Version="32.2.7" />
-  </ItemGroup>
 
 </Project>
